@@ -3,466 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tammh_TOL: English Adventure</title>
+    <title>Tammh_TOL: English Master Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f7f7f7;
-            touch-action: manipulation;
-            user-select: none;
-        }
-
-        /* Duolingo Button Styles */
-        .btn-chunky {
-            transition: all 0.1s ease;
-            border-bottom-width: 4px;
-        }
-        .btn-chunky:active {
-            transform: translateY(2px);
-            border-bottom-width: 0px;
-            margin-bottom: 4px;
-        }
+        body { font-family: 'Nunito', sans-serif; background-color: #f7f7f7; touch-action: manipulation; }
+        .btn-chunky { transition: all 0.1s ease; border-bottom-width: 4px; }
+        .btn-chunky:active { transform: translateY(2px); border-bottom-width: 0px; margin-bottom: 4px; }
         .btn-primary { background-color: #58cc02; border-color: #46a302; color: white; }
         .btn-secondary { background-color: #1cb0f6; border-color: #1899d6; color: white; }
-        .btn-white { background-color: white; border-color: #e5e5e5; color: #afafaf; }
+        .btn-difficulty { background-color: #ff9600; border-color: #e68a00; color: white; }
+        .btn-white { background-color: white; border-color: #e5e5e5; color: #4b4b4b; }
         .btn-danger { background-color: #ff4b4b; border-color: #d33131; color: white; }
-
-        /* Animations */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-
-        @keyframes bounce-in {
-            0% { transform: scale(0.9); opacity: 0; }
-            70% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-pop { animation: bounce-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-        /* Confetti Effect */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f2d74e;
-            top: -10px;
-            z-index: 50;
-            animation: fall 3s linear infinite;
-        }
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(360deg); }
-        }
-
-        .progress-fill { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .progress-fill { transition: width 0.5s ease-in-out; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center">
+<body class="min-h-screen flex flex-col items-center p-0 m-0">
 
-    <nav id="nav-bar" class="w-full max-w-md px-6 py-4 flex items-center gap-4 hidden">
-        <button onclick="confirmExit()" class="text-gray-400 hover:text-gray-600 transition">
-            <i class="fa-solid fa-xmark text-2xl"></i>
-        </button>
-        <div class="flex-1 bg-gray-200 h-4 rounded-full overflow-hidden border-b-2 border-gray-300">
-            <div id="progress-bar" class="progress-fill bg-green-500 h-full w-0"></div>
-        </div>
-        <div class="flex items-center gap-2 text-orange-500 font-extrabold">
-            <i class="fa-solid fa-bolt"></i>
-            <span id="score-display">0</span>
-        </div>
+    <nav id="nav-bar" class="w-full max-w-md px-6 py-4 flex items-center gap-4 hidden z-10 bg-white/80 backdrop-blur-md sticky top-0">
+        <button onclick="resetGame()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        <div class="flex-1 bg-gray-200 h-3 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill bg-green-500 h-full w-0"></div></div>
+        <div class="flex items-center gap-1 text-orange-500 font-extrabold"><i class="fa-solid fa-bolt"></i><span id="score-display">0</span></div>
     </nav>
 
-    <main id="app-container" class="w-full max-w-md flex-1 flex flex-col px-6 py-4">
+    <main id="app-container" class="w-full max-w-md flex-1 flex flex-col px-6 py-4 justify-center">
         </main>
 
     <script>
-        /** * DATA STRUCTURE
-         * Mock data for 3 Categories with at least 3 items each
+        /** * DATA ENGINE
+         * Cấu trúc dữ liệu theo Lớp -> Chủ đề -> Mức độ
          */
-        const appData = {
-            kids: {
-                title: "Tiểu học (Lớp 1-5)",
-                items: [
-                    {
-                        id: 1, word: "Elephant", vi: "Con voi", 
-                        image: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Elephant", "Cat", "Dog", "Mouse"],
-                        spellDisplay: "E L E _ H A N T", spellAnswer: "P", spellOptions: ["P", "B", "M", "L"],
-                        sentence: "The ___ has a very long trunk.", sentenceAnswer: "Elephant", sentenceOptions: ["Elephant", "Bird", "Fish", "Ant"]
-                    },
-                    {
-                        id: 2, word: "Orange", vi: "Quả cam", 
-                        image: "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Apple", "Orange", "Grape", "Banana"],
-                        spellDisplay: "O R A N _ E", spellAnswer: "G", spellOptions: ["G", "K", "D", "P"],
-                        sentence: "I like to drink ___ juice.", sentenceAnswer: "Orange", sentenceOptions: ["Orange", "Milk", "Water", "Tea"]
-                    },
-                    {
-                        id: 3, word: "Running", vi: "Chạy bộ", 
-                        image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Sleeping", "Eating", "Running", "Reading"],
-                        spellDisplay: "R U N _ I N G", spellAnswer: "N", spellOptions: ["N", "M", "B", "T"],
-                        sentence: "He is ___ in the park.", sentenceAnswer: "Running", sentenceOptions: ["Running", "Cooking", "Crying", "Flying"]
-                    }
-                ]
-            },
-            teens: {
-                title: "Trung học (Lớp 6-12)",
-                items: [
-                    {
-                        id: 101, word: "Environment", vi: "Môi trường", 
-                        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Environment", "Pollution", "Climate", "Nature"],
-                        spellDisplay: "E N V I R O N _ E N T", spellAnswer: "M", spellOptions: ["M", "N", "L", "K"],
-                        sentence: "We must protect our ___.", sentenceAnswer: "Environment", sentenceOptions: ["Environment", "City", "Money", "House"]
-                    },
-                    {
-                        id: 102, word: "Technology", vi: "Công nghệ", 
-                        image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Science", "Math", "History", "Technology"],
-                        spellDisplay: "T E C H _ O L O G Y", spellAnswer: "N", spellOptions: ["N", "H", "M", "W"],
-                        sentence: "Modern ___ makes life easier.", sentenceAnswer: "Technology", sentenceOptions: ["Technology", "Food", "Clothes", "Weather"]
-                    },
-                    {
-                        id: 103, word: "Mountain", vi: "Núi", 
-                        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Beach", "Forest", "Mountain", "River"],
-                        spellDisplay: "M O U N T A _ N", spellAnswer: "I", spellOptions: ["I", "E", "A", "O"],
-                        sentence: "Mount Everest is the highest ___.", sentenceAnswer: "Mountain", sentenceOptions: ["Mountain", "Building", "Tree", "Wave"]
-                    }
-                ]
-            },
-            adults: {
-                title: "Giao tiếp & Đi làm",
-                items: [
-                    {
-                        id: 201, word: "Report", vi: "Báo cáo", 
-                        image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Email", "Meeting", "Invoice", "Report"],
-                        spellDisplay: "R E P O R _", spellAnswer: "T", spellOptions: ["T", "D", "P", "S"],
-                        sentence: "Could you send me the monthly ___?", sentenceAnswer: "Report", sentenceOptions: ["Report", "Coffee", "Desk", "Gift"]
-                    },
-                    {
-                        id: 202, word: "Meeting", vi: "Cuộc họp", 
-                        image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Holiday", "Meeting", "Lunch", "Party"],
-                        spellDisplay: "M E E T I _ G", spellAnswer: "N", spellOptions: ["N", "H", "B", "K"],
-                        sentence: "The ___ starts at 9:00 AM.", sentenceAnswer: "Meeting", sentenceOptions: ["Meeting", "Movie", "Bus", "Rain"]
-                    },
-                    {
-                        id: 203, word: "Deadline", vi: "Hạn chót", 
-                        image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=400&q=80",
-                        quizOptions: ["Deadline", "Start", "Time", "Date"],
-                        spellDisplay: "D E A D L I _ E", spellAnswer: "N", spellOptions: ["N", "M", "T", "L"],
-                        sentence: "We must finish before the ___.", sentenceAnswer: "Deadline", sentenceOptions: ["Deadline", "Lunch", "Weekend", "Morning"]
-                    }
-                ]
-            }
+        const gameData = {
+            grades: [
+                { id: 'g1', name: 'Lớp 1' }, { id: 'g2', name: 'Lớp 2' }, { id: 'g3', name: 'Lớp 3' },
+                { id: 'g4', name: 'Lớp 4' }, { id: 'g5', name: 'Lớp 5' }, { id: 'g6', name: 'Lớp 6' },
+                { id: 'g7', name: 'Lớp 7' }, { id: 'g8', name: 'Lớp 8' }, { id: 'g9', name: 'Lớp 9' },
+                { id: 'work', name: 'Người Đi Làm' }
+            ],
+            topics: [
+                { id: 'animals', name: 'Con vật', icon: 'fa-dog' },
+                { id: 'fruits', name: 'Hoa quả', icon: 'fa-apple-whole' },
+                { id: 'office', name: 'Văn phòng', icon: 'fa-briefcase' }
+            ],
+            levels: [
+                { id: 'easy', name: 'Dễ', color: 'bg-green-400', options: 2 },
+                { id: 'normal', name: 'Bình thường', color: 'bg-blue-400', options: 4 },
+                { id: 'hard', name: 'Khó', color: 'bg-orange-500', options: 4 },
+                { id: 'extreme', name: 'Siêu khó', color: 'bg-red-600', options: 6 }
+            ],
+            // Mock database mẫu (Trong thực tế có thể mở rộng mảng này)
+            words: [
+                { grade: 'g1', topic: 'animals', word: 'Cat', vi: 'Con mèo', img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400' },
+                { grade: 'g1', topic: 'animals', word: 'Dog', vi: 'Con chó', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400' },
+                { grade: 'g9', topic: 'animals', word: 'Biodiversity', vi: 'Đa dạng sinh học', img: 'https://images.unsplash.com/photo-1500829243541-74b677fecc30?w=400' },
+                { grade: 'work', topic: 'office', word: 'Negotiation', vi: 'Đàm phán', img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400' }
+                // Thêm hàng trăm từ khác tại đây...
+            ]
         };
 
-        /** * APP STATE
-         */
         let state = {
-            phase: 0, // 0: Selection, 1: Learn, 2: ImageQuiz, 3: Spelling, 4: Context, 5: Results
-            category: null,
-            items: [],
-            currentIndex: 0,
-            score: 0,
-            correctWords: [],
-            wrongWords: [],
-            totalSteps: 0,
-            currentStep: 0
+            step: 'select-grade',
+            grade: null, topic: null, level: null,
+            items: [], currentIndex: 0, phase: 1, // 1: Learn, 2: Quiz, 3: Spell, 4: Context
+            score: 0, correctList: [], wrongList: []
         };
 
         const container = document.getElementById('app-container');
-        const nav = document.getElementById('nav-bar');
-        const progressBar = document.getElementById('progress-bar');
-        const scoreDisplay = document.getElementById('score-display');
 
-        // AUDIO EFFECTS (Base64)
-        const sfx = {
-            correct: new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAnwCnAKcA...'), // Short chime
-            wrong: new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRAAAAAAnwCnAKcA...')  // Buzzer
-        };
+        function init() { render(); }
 
-        /**
-         * CORE LOGIC
-         */
-        function initApp() {
-            renderPart0();
+        /** * VIEW CONTROLLERS */
+        function render() {
+            container.innerHTML = '';
+            if (state.step === 'select-grade') renderGradeSelection();
+            else if (state.step === 'select-topic') renderTopicSelection();
+            else if (state.step === 'select-level') renderLevelSelection();
+            else renderGame();
         }
 
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
+        function renderGradeSelection() {
+            let html = `<h1 class="text-2xl font-black text-center mb-8">Bạn đang học lớp mấy?</h1><div class="grid grid-cols-2 gap-3">`;
+            gameData.grades.forEach(g => {
+                html += `<button onclick="selectGrade('${g.id}')" class="btn-chunky btn-white py-4 rounded-2xl font-bold">${g.name}</button>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        function updateProgress() {
-            const percent = (state.currentStep / state.totalSteps) * 100;
-            progressBar.style.width = `${percent}%`;
-            scoreDisplay.innerText = state.score;
+        function renderTopicSelection() {
+            let html = `<h1 class="text-2xl font-black text-center mb-8">Chọn chủ đề yêu thích</h1><div class="space-y-4">`;
+            gameData.topics.forEach(t => {
+                html += `<button onclick="selectTopic('${t.id}')" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-bold text-lg flex items-center px-6">
+                    <i class="fa-solid ${t.icon} mr-4"></i> ${t.name}</button>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        function playSound(type) {
-            // Simplified sound logic
-            if(type === 'correct') {
-                // Success feedback
-            } else {
-                // Fail feedback
-            }
+        function renderLevelSelection() {
+            let html = `<h1 class="text-2xl font-black text-center mb-8">Chọn thử thách</h1><div class="space-y-4">`;
+            gameData.levels.forEach(l => {
+                html += `<button onclick="selectLevel('${l.id}')" class="w-full btn-chunky ${l.color} text-white py-4 rounded-2xl font-black text-xl uppercase tracking-wider">
+                    ${l.name}</button>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        /**
-         * PART 0: MODE SELECTION
-         */
-        function renderPart0() {
-            nav.classList.add('hidden');
-            container.innerHTML = `
-                <div class="flex-1 flex flex-col items-center justify-center text-center animate-pop">
-                    <img src="https://d35aaqx5ub95lt.cloudfront.net/images/owls/769733075b927282c0e86b0a2323e433.svg" class="w-32 mb-6">
-                    <h1 class="text-3xl font-extrabold text-gray-700 mb-2">Chào mừng bạn!</h1>
-                    <p class="text-gray-500 mb-8 font-semibold">Chọn hành trình học tập của bạn để bắt đầu nhé</p>
-                    
-                    <div class="w-full space-y-4">
-                        <button onclick="startGame('kids')" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-extrabold text-lg flex items-center justify-between px-6">
-                            <span><i class="fa-solid fa-child mr-3"></i> Tiểu học (1-5)</span>
-                            <i class="fa-solid fa-chevron-right opacity-50"></i>
-                        </button>
-                        <button onclick="startGame('teens')" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-extrabold text-lg flex items-center justify-between px-6">
-                            <span><i class="fa-solid fa-graduation-cap mr-3"></i> Trung học (6-9)</span>
-                            <i class="fa-solid fa-chevron-right opacity-50"></i>
-                        </button>
-                        <button onclick="startGame('adults')" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-extrabold text-lg flex items-center justify-between px-6">
-                            <span><i class="fa-solid fa-briefcase mr-3"></i> Đi làm & Giao tiếp</span>
-                            <i class="fa-solid fa-chevron-right opacity-50"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
+        /** * LOGIC HANDLERS */
+        function selectGrade(id) { state.grade = id; state.step = 'select-topic'; render(); }
+        function selectTopic(id) { state.topic = id; state.step = 'select-level'; render(); }
+        
+        function selectLevel(id) { 
+            state.level = id; 
+            state.step = 'game';
+            // Lọc dữ liệu: Nếu không có từ cho lớp cụ thể, lấy từ lớp thấp hơn (để game không bị trống)
+            state.items = gameData.words.filter(w => (w.grade === state.grade || w.grade === 'g1') && (state.topic === 'any' || w.topic === state.topic)).slice(0, 5);
+            document.getElementById('nav-bar').classList.remove('hidden');
+            render(); 
         }
 
-        function startGame(catKey) {
-            state.category = catKey;
-            state.items = [...appData[catKey].items];
-            state.score = 0;
-            state.currentIndex = 0;
-            state.phase = 1;
-            state.currentStep = 0;
-            state.totalSteps = state.items.length * 4; // Learn + 3 Quiz modes
-            state.correctWords = [];
-            state.wrongWords = [];
+        function renderGame() {
+            const item = state.items[state.currentIndex];
+            if (!item) { renderResults(); return; }
             
-            nav.classList.remove('hidden');
-            renderPhase();
-        }
-
-        /**
-         * PHASE ROUTER
-         */
-        function renderPhase() {
             updateProgress();
-            if (state.phase === 1) renderLearn();
-            else if (state.phase === 2) renderImageQuiz();
-            else if (state.phase === 3) renderSpelling();
-            else if (state.phase === 4) renderContext();
-            else renderResults();
+            if (state.phase === 1) renderLearn(item);
+            else if (state.phase === 2) renderQuiz(item);
+            else if (state.phase === 3) renderSpell(item);
+            else if (state.phase === 4) renderContext(item);
         }
 
-        /**
-         * PART 1: LEARN (FLASHCARDS)
-         */
-        function renderLearn() {
-            const item = state.items[state.currentIndex];
+        function renderLearn(item) {
             container.innerHTML = `
-                <div class="flex-1 flex flex-col animate-pop">
-                    <h2 class="text-2xl font-black text-gray-700 mb-6">Hãy ghi nhớ từ này!</h2>
-                    <div class="flex-1 flex flex-col items-center">
-                        <div class="w-full h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white mb-6">
-                            <img src="${item.image}" class="w-full h-full object-cover">
-                        </div>
-                        <button onclick="speak('${item.word}')" class="bg-blue-100 text-blue-500 p-4 rounded-full mb-4 hover:bg-blue-200 transition">
-                            <i class="fa-solid fa-volume-high text-3xl"></i>
-                        </button>
-                        <h3 class="text-4xl font-black text-blue-600 mb-2 uppercase tracking-wide">${item.word}</h3>
-                        <p class="text-2xl font-bold text-gray-400 italic">${item.vi}</p>
-                    </div>
-                    <button onclick="nextStep()" class="w-full btn-chunky btn-primary py-4 rounded-2xl font-extrabold text-xl mt-6 uppercase">Tiếp theo</button>
-                </div>
-            `;
-            setTimeout(() => speak(item.word), 300);
-        }
-
-        /**
-         * PART 2: IMAGE QUIZ
-         */
-        function renderImageQuiz() {
-            const item = state.items[state.currentIndex];
-            container.innerHTML = `
-                <div class="flex-1 flex flex-col animate-pop" id="quiz-screen">
-                    <h2 class="text-2xl font-black text-gray-700 mb-6">Nhìn hình và chọn từ đúng:</h2>
-                    <div class="w-full h-48 rounded-3xl overflow-hidden shadow-md mb-8">
-                        <img src="${item.image}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${item.quizOptions.map(opt => `
-                            <button onclick="checkAnswer(this, '${opt}', '${item.word}')" class="btn-chunky btn-white py-4 rounded-2xl font-bold text-lg border-2">
-                                ${opt}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+                <div class="animate-pop text-center">
+                    <h2 class="text-xl font-bold text-gray-400 mb-4 uppercase">Ghi nhớ từ mới</h2>
+                    <img src="${item.img}" class="w-full h-64 object-cover rounded-3xl shadow-lg mb-6 border-4 border-white">
+                    <h3 class="text-4xl font-extrabold text-blue-500 mb-2">${item.word}</h3>
+                    <p class="text-2xl text-gray-500 mb-8">${item.vi}</p>
+                    <button onclick="speak('${item.word}'); nextPhase();" class="w-full btn-chunky btn-primary py-4 rounded-2xl font-black text-xl">TIẾP TỤC</button>
+                </div>`;
             speak(item.word);
         }
 
-        /**
-         * PART 3: SPELLING TEST
-         */
-        function renderSpelling() {
-            const item = state.items[state.currentIndex];
+        function renderQuiz(item) {
+            const levelConfig = gameData.levels.find(l => l.id === state.level);
+            // Tạo options giả dựa trên độ khó
+            const options = [item.word, "Apple", "Banana", "Orange", "Table", "House"].slice(0, levelConfig.options).sort(() => Math.random() - 0.5);
+
             container.innerHTML = `
-                <div class="flex-1 flex flex-col animate-pop" id="quiz-screen">
-                    <h2 class="text-2xl font-black text-gray-700 mb-6">Điền chữ cái còn thiếu:</h2>
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border-2 border-gray-100 mb-8 text-center">
-                        <h3 class="text-4xl font-black text-blue-500 tracking-widest">${item.spellDisplay}</h3>
+                <div class="animate-pop">
+                    <h2 class="text-xl font-bold text-gray-700 mb-6">Đây là gì?</h2>
+                    <img src="${item.img}" class="w-full h-40 object-cover rounded-2xl mb-6 shadow-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        ${options.map(opt => `<button onclick="checkAnswer(this, '${opt}', '${item.word}')" class="btn-chunky btn-white py-4 rounded-xl font-bold border-2">${opt}</button>`).join('')}
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${item.spellOptions.map(opt => `
-                            <button onclick="checkAnswer(this, '${opt}', '${item.spellAnswer}')" class="btn-chunky btn-white py-4 rounded-2xl font-black text-2xl">
-                                ${opt}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        /**
-         * PART 4: CONTEXT TEST
-         */
-        function renderContext() {
-            const item = state.items[state.currentIndex];
+        function renderSpell(item) {
+            const word = item.word.toUpperCase();
+            // Độ khó quyết định bao nhiêu chữ cái bị mất
+            let hideCount = state.level === 'easy' ? 1 : (state.level === 'extreme' ? 3 : 2);
+            let display = word.split('');
+            let missingIndices = [];
+            for(let i=0; i<hideCount; i++) {
+                let idx = Math.floor(Math.random() * word.length);
+                if(!missingIndices.includes(idx)) {
+                    missingIndices.push(idx);
+                    display[idx] = '_';
+                }
+            }
+            const correctAnswer = word[missingIndices[0]];
+            const options = [correctAnswer, 'X', 'O', 'A', 'E', 'N'].slice(0, 4).sort(() => Math.random() - 0.5);
+
             container.innerHTML = `
-                <div class="flex-1 flex flex-col animate-pop" id="quiz-screen">
-                    <h2 class="text-2xl font-black text-gray-700 mb-6">Chọn từ điền vào chỗ trống:</h2>
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border-2 border-gray-100 mb-8 italic">
-                        <p class="text-2xl text-gray-600 leading-relaxed">"${item.sentence.replace('___', '<span class="text-blue-600 font-black">___</span>')}"</p>
-                    </div>
+                <div class="animate-pop text-center">
+                    <h2 class="text-xl font-bold text-gray-700 mb-8">Hoàn thành từ:</h2>
+                    <div class="text-5xl font-black tracking-widest text-blue-600 mb-12">${display.join(' ')}</div>
                     <div class="grid grid-cols-2 gap-4">
-                        ${item.sentenceOptions.map(opt => `
-                            <button onclick="checkAnswer(this, '${opt}', '${item.sentenceAnswer}')" class="btn-chunky btn-white py-3 rounded-2xl font-bold text-lg">
-                                ${opt}
-                            </button>
-                        `).join('')}
+                        ${options.map(opt => `<button onclick="checkAnswer(this, '${opt}', '${correctAnswer}')" class="btn-chunky btn-white py-4 rounded-2xl font-black text-2xl">${opt}</button>`).join('')}
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        /**
-         * GAME LOGIC HELPERS
-         */
+        function renderContext(item) {
+            const sentence = `I can see a beautiful ${item.word.toLowerCase()} over there.`;
+            container.innerHTML = `
+                <div class="animate-pop">
+                    <h2 class="text-xl font-bold text-gray-700 mb-6">Điền vào chỗ trống:</h2>
+                    <div class="bg-white p-6 rounded-2xl border-2 border-gray-100 mb-8 text-xl italic text-gray-600 leading-relaxed">
+                        "${sentence.replace(item.word.toLowerCase(), '_____')}"
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                         <button onclick="checkAnswer(this, '${item.word}', '${item.word}')" class="btn-chunky btn-white py-4 rounded-xl font-bold">${item.word}</button>
+                         <button onclick="checkAnswer(this, 'Something', '${item.word}')" class="btn-chunky btn-white py-4 rounded-xl font-bold">Something</button>
+                    </div>
+                </div>`;
+        }
+
+        /** * ENGINE HELPERS */
         function checkAnswer(btn, selected, correct) {
-            const quizScreen = document.getElementById('quiz-screen');
-            if (selected === correct) {
-                btn.classList.remove('btn-white');
-                btn.classList.add('bg-green-500', 'border-green-600', 'text-white');
+            if (selected.toUpperCase() === correct.toUpperCase()) {
+                btn.className = "btn-chunky btn-primary py-4 rounded-xl font-bold w-full";
                 state.score += 10;
-                
-                // Ghi nhận từ vựng
-                const currentWord = state.items[state.currentIndex].word;
-                if (!state.correctWords.includes(currentWord)) state.correctWords.push(currentWord);
-
-                setTimeout(() => nextStep(), 600);
+                setTimeout(nextPhase, 600);
             } else {
-                quizScreen.classList.add('animate-shake');
-                btn.classList.remove('btn-white');
-                btn.classList.add('btn-danger');
-                
-                const currentWord = state.items[state.currentIndex].word;
-                if (!state.wrongWords.includes(currentWord)) state.wrongWords.push(currentWord);
-
-                setTimeout(() => {
-                    quizScreen.classList.remove('animate-shake');
-                }, 400);
+                btn.className = "btn-chunky btn-danger py-4 rounded-xl font-bold w-full animate-shake";
+                state.score = Math.max(0, state.score - 5);
+                document.getElementById('score-display').innerText = state.score;
             }
         }
 
-        function nextStep() {
-            state.currentStep++;
-            state.currentIndex++;
-
-            if (state.currentIndex >= state.items.length) {
-                state.currentIndex = 0;
-                state.phase++;
+        function nextPhase() {
+            state.phase++;
+            if (state.phase > 4) {
+                state.phase = 1;
+                state.currentIndex++;
             }
-            renderPhase();
+            render();
         }
 
-        /**
-         * PART 5: RESULT SUMMARY
-         */
+        function updateProgress() {
+            const total = state.items.length * 4;
+            const current = (state.currentIndex * 4) + state.phase;
+            document.getElementById('progress-bar').style.width = `${(current/total)*100}%`;
+            document.getElementById('score-display').innerText = state.score;
+        }
+
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }
+
+        function resetGame() { location.reload(); }
+
         function renderResults() {
-            nav.classList.add('hidden');
-            createConfetti();
-            
+            document.getElementById('nav-bar').classList.add('hidden');
             container.innerHTML = `
-                <div class="flex-1 flex flex-col items-center animate-pop">
-                    <img src="https://d35aaqx5ub95lt.cloudfront.net/images/owls/9903901b5c879d747a750d0a77519390.svg" class="w-32 mb-4">
-                    <h2 class="text-3xl font-black text-orange-500 mb-2">Hoàn thành xuất sắc!</h2>
-                    <p class="text-gray-500 font-bold mb-6">Bạn đã nhận được <span class="text-orange-500">${state.score} XP</span></p>
-                    
-                    <div class="w-full grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-white p-4 rounded-2xl border-2 border-gray-100 text-center">
-                            <p class="text-gray-400 text-sm font-bold uppercase">Chính xác</p>
-                            <p class="text-2xl font-black text-green-500">${state.correctWords.length}</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border-2 border-gray-100 text-center">
-                            <p class="text-gray-400 text-sm font-bold uppercase">Cần ôn lại</p>
-                            <p class="text-2xl font-black text-red-500">${state.wrongWords.length}</p>
-                        </div>
-                    </div>
-
-                    <div class="w-full flex-1 overflow-y-auto space-y-2 mb-6 max-h-48 px-2">
-                        <p class="text-gray-400 font-black text-xs uppercase mb-2">Từ vựng đã học:</p>
-                        ${state.correctWords.map(w => `<div class="flex items-center text-green-600 font-bold"><i class="fa-solid fa-circle-check mr-2"></i> ${w}</div>`).join('')}
-                        ${state.wrongWords.map(w => `<div class="flex items-center text-red-400 font-bold"><i class="fa-solid fa-circle-exclamation mr-2"></i> ${w}</div>`).join('')}
-                    </div>
-
-                    <button onclick="location.reload()" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-extrabold text-xl uppercase">Chơi lại</button>
-                </div>
-            `;
+                <div class="text-center animate-pop">
+                    <i class="fa-solid fa-trophy text-7xl text-yellow-400 mb-4"></i>
+                    <h1 class="text-3xl font-black mb-2">Tuyệt vời!</h1>
+                    <p class="text-gray-500 font-bold mb-8">Bạn đã hoàn thành bài học với <span class="text-orange-500">${state.score} XP</span></p>
+                    <button onclick="resetGame()" class="w-full btn-chunky btn-secondary py-4 rounded-2xl font-black text-xl">CHƠI TIẾP</button>
+                </div>`;
         }
 
-        function createConfetti() {
-            for(let i=0; i<50; i++) {
-                const c = document.createElement('div');
-                c.className = 'confetti';
-                c.style.left = Math.random() * 100 + 'vw';
-                c.style.backgroundColor = ['#ff4b4b', '#58cc02', '#1cb0f6', '#f2d74e'][Math.floor(Math.random()*4)];
-                c.style.animationDuration = (Math.random() * 2 + 1) + 's';
-                c.style.opacity = Math.random();
-                document.body.appendChild(c);
-                setTimeout(() => c.remove(), 3000);
-            }
-        }
-
-        function confirmExit() {
-            if(confirm("Bạn có muốn dừng trò chơi không? Tiến trình sẽ bị mất.")) {
-                location.reload();
-            }
-        }
-
-        // START THE APP
-        initApp();
+        init();
     </script>
 </body>
 </html>
