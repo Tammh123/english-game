@@ -54,3 +54,413 @@
                 <div class="flex gap-2">
                     <button onclick="setDifficulty('easy', this)" class="difficulty-btn flex-1 py-2 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-bold text-sm">🟢 Dễ</button>
                     <button onclick="setDifficulty('normal', this)" class="difficulty-btn active flex-1 py-2 rounded-xl border-2 border-blue-600 bg-blue-500 text-white font-bold text-sm">🟡 Vừa</button>
+                    <button onclick="setDifficulty('hard', this)" class="difficulty-btn flex-1 py-2 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-bold text-sm">🔴 Khó</button>
+                </div>
+                <p id="difficulty-desc" class="text-xs text-blue-600 mt-2 font-medium">Bao gồm: Học từ ➡️ Trắc nghiệm ➡️ Điền chữ</p>
+            </div>
+
+            <div id="category-list" class="w-full flex flex-col gap-3 pb-8">
+                </div>
+        </div>
+
+        <div id="screen-1" class="screen flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-400 mb-6 uppercase tracking-wider">Học từ mới</h2>
+            <div class="flex-1 w-full flex flex-col items-center justify-center">
+                <div class="w-full aspect-square rounded-3xl overflow-hidden border-4 border-gray-200 mb-6 shadow-sm relative cursor-pointer" onclick="playAudio('word')">
+                    <img id="flashcard-img" src="" alt="word" class="w-full h-full object-cover">
+                    <button class="absolute bottom-3 right-3 bg-blue-500 text-white p-4 rounded-full shadow-lg text-xl active:scale-95 transition">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <h1 id="flashcard-en" class="text-5xl font-extrabold text-blue-600 mb-2 capitalize"></h1>
+                <p id="flashcard-vi" class="text-2xl text-gray-500 font-medium"></p>
+            </div>
+            <button onclick="handleCorrect()" class="btn-duo w-full bg-green-500 border-b-4 border-green-700 text-white font-bold text-xl py-4 rounded-2xl mt-4">
+                Tiếp tục
+            </button>
+        </div>
+
+        <div id="screen-2" class="screen flex-col">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Hình này là gì?</h2>
+            <div class="w-full h-56 rounded-3xl overflow-hidden border-4 border-gray-200 mb-6 shadow-sm relative">
+                <img id="quiz-img" src="" alt="quiz" class="w-full h-full object-cover">
+                <button onclick="playAudio('word')" class="absolute top-3 right-3 bg-white text-blue-500 p-3 rounded-full shadow hover:bg-gray-100">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+            <div id="quiz-options" class="grid grid-cols-2 gap-3 flex-1 content-end"></div>
+        </div>
+
+        <div id="screen-3" class="screen flex-col">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Chữ cái còn thiếu?</h2>
+            <div class="w-full flex-1 flex flex-col items-center justify-center mb-6">
+                <div class="w-32 h-32 rounded-3xl overflow-hidden border-4 border-gray-200 mb-8 shadow-sm">
+                    <img id="spell-img" src="" alt="spell" class="w-full h-full object-cover">
+                </div>
+                <div id="spell-word" class="text-5xl font-extrabold tracking-[0.2em] text-gray-700 text-center"></div>
+            </div>
+            <div id="spell-options" class="grid grid-cols-4 gap-2 mb-2 content-end"></div>
+        </div>
+
+        <div id="screen-4" class="screen flex-col">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Điền vào chỗ trống</h2>
+            <div class="flex-1 flex flex-col items-center justify-center p-6 bg-blue-50 rounded-3xl border-4 border-blue-100 mb-6 relative">
+                <button onclick="playAudio('sentence')" class="absolute top-3 right-3 text-blue-400 hover:text-blue-600 text-xl"><i class="fas fa-volume-up"></i></button>
+                <p id="sentence-text" class="text-3xl font-bold text-center text-gray-700 leading-relaxed"></p>
+            </div>
+            <div id="sentence-options" class="grid grid-cols-1 gap-3 content-end"></div>
+        </div>
+
+        <div id="screen-5" class="screen flex-col items-center text-center justify-center">
+            <i class="fas fa-trophy text-7xl text-yellow-400 mb-4 drop-shadow-lg"></i>
+            <h1 class="text-4xl font-extrabold text-orange-500 mb-2">Tuyệt vời!</h1>
+            <p class="text-lg text-gray-500 font-medium mb-8">Bạn nhận được <span id="final-xp" class="text-orange-500 font-bold text-2xl"></span> XP</p>
+            
+            <div class="w-full text-left bg-green-50 rounded-2xl p-4 border-2 border-green-200 mb-4">
+                <h3 class="text-green-700 font-bold mb-3"><i class="fas fa-check-circle mr-1"></i> Từ đã thuộc:</h3>
+                <div id="correct-list" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <div id="wrong-container" class="w-full text-left bg-red-50 rounded-2xl p-4 border-2 border-red-200 mb-4 hidden">
+                <h3 class="text-red-700 font-bold mb-3"><i class="fas fa-times-circle mr-1"></i> Cần ôn lại:</h3>
+                <div id="wrong-list" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <button onclick="returnToHome()" class="btn-duo w-full bg-blue-500 border-b-4 border-blue-700 text-white font-bold text-xl py-4 rounded-2xl mt-auto shadow-lg hover:bg-blue-400">
+                <i class="fas fa-home mr-2"></i> Về trang chủ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. AUDIO & TTS SYSTEM ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            } else {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            }
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playAudio(type) {
+            const item = appData.categories[state.category].items[state.itemIndex];
+            const text = type === 'word' ? item.word : item.sentence.replace('___', item.sentenceAnswer);
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US'; utterance.rate = 0.85;
+            speechSynthesis.speak(utterance);
+        }
+
+        // --- 2. DATA (13 TOPICS x 5 WORDS EACH) ---
+        const getImg = (word) => `https://loremflickr.com/400/400/${word.toLowerCase()}`;
+        
+        const appData = {
+            categories: {
+                numbers: { title: "Số đếm (Numbers)", icon: "fa-1", color: "bg-red-500", items: [
+                    { word: "One", vi: "Số một", image: getImg("one,number"), quizOptions: ["Two", "One", "Three", "Four"], spellDisplay: "O _ E", spellAnswer: "N", spellOptions: ["N", "M", "W", "V"], sentence: "I have ___ apple.", sentenceAnswer: "One", sentenceOptions: ["One", "Two", "Cat", "Dog"] },
+                    { word: "Two", vi: "Số hai", image: getImg("two,number"), quizOptions: ["Three", "One", "Two", "Five"], spellDisplay: "T _ O", spellAnswer: "W", spellOptions: ["W", "V", "U", "Y"], sentence: "I have ___ eyes.", sentenceAnswer: "Two", sentenceOptions: ["Two", "Red", "Book", "Car"] },
+                    { word: "Three", vi: "Số ba", image: getImg("three,number"), quizOptions: ["One", "Three", "Four", "Two"], spellDisplay: "T H R _ E", spellAnswer: "E", spellOptions: ["A", "E", "I", "O"], sentence: "There are ___ birds.", sentenceAnswer: "Three", sentenceOptions: ["Three", "Blue", "Fish", "Run"] },
+                    { word: "Four", vi: "Số bốn", image: getImg("four,number"), quizOptions: ["Four", "Five", "One", "Two"], spellDisplay: "F O U _", spellAnswer: "R", spellOptions: ["R", "T", "D", "S"], sentence: "I see ___ cars.", sentenceAnswer: "Four", sentenceOptions: ["Four", "Apple", "Blue", "Pen"] },
+                    { word: "Five", vi: "Số năm", image: getImg("five,number"), quizOptions: ["Three", "Four", "Five", "Six"], spellDisplay: "F I _ E", spellAnswer: "V", spellOptions: ["V", "F", "D", "W"], sentence: "I have ___ fingers.", sentenceAnswer: "Five", sentenceOptions: ["Five", "Dog", "Red", "Hat"] }
+                ]},
+                school: { title: "Đồ dùng học tập", icon: "fa-pencil-alt", color: "bg-blue-500", items: [
+                    { word: "Pen", vi: "Cái bút", image: getImg("pen"), quizOptions: ["Book", "Pen", "Desk", "Ruler"], spellDisplay: "P _ N", spellAnswer: "E", spellOptions: ["A", "E", "I", "O"], sentence: "I write with a ___.", sentenceAnswer: "Pen", sentenceOptions: ["Pen", "Apple", "Shoe", "Car"] },
+                    { word: "Book", vi: "Quyển sách", image: getImg("book"), quizOptions: ["Pen", "Bag", "Book", "Chair"], spellDisplay: "B O O _", spellAnswer: "K", spellOptions: ["K", "C", "T", "D"], sentence: "I read a ___.", sentenceAnswer: "Book", sentenceOptions: ["Book", "Milk", "Tree", "Hat"] },
+                    { word: "Bag", vi: "Cái cặp", image: getImg("backpack"), quizOptions: ["Bag", "Ruler", "Desk", "Pen"], spellDisplay: "B _ G", spellAnswer: "A", spellOptions: ["A", "E", "U", "I"], sentence: "I put books in my ___.", sentenceAnswer: "Bag", sentenceOptions: ["Bag", "Bed", "Sun", "Dog"] },
+                    { word: "Ruler", vi: "Cái thước", image: getImg("ruler"), quizOptions: ["Eraser", "Ruler", "Pen", "Book"], spellDisplay: "R U L E _", spellAnswer: "R", spellOptions: ["R", "D", "L", "T"], sentence: "I draw a line with a ___.", sentenceAnswer: "Ruler", sentenceOptions: ["Ruler", "Cat", "Fish", "Shoe"] },
+                    { word: "Eraser", vi: "Cục tẩy", image: getImg("eraser"), quizOptions: ["Pen", "Ruler", "Eraser", "Bag"], spellDisplay: "E R A S E _", spellAnswer: "R", spellOptions: ["R", "S", "L", "N"], sentence: "I clean the paper with an ___.", sentenceAnswer: "Eraser", sentenceOptions: ["Eraser", "Dog", "Sun", "Hat"] }
+                ]},
+                body: { title: "Cơ thể (Body)", icon: "fa-hand-paper", color: "bg-orange-500", items: [
+                    { word: "Eye", vi: "Mắt", image: getImg("eye"), quizOptions: ["Ear", "Eye", "Nose", "Hand"], spellDisplay: "E _ E", spellAnswer: "Y", spellOptions: ["Y", "I", "A", "U"], sentence: "I see with my ___.", sentenceAnswer: "Eye", sentenceOptions: ["Eye", "Ear", "Hand", "Leg"] },
+                    { word: "Hand", vi: "Bàn tay", image: getImg("hand"), quizOptions: ["Foot", "Arm", "Hand", "Leg"], spellDisplay: "H A N _", spellAnswer: "D", spellOptions: ["D", "T", "B", "P"], sentence: "I clap my ___s.", sentenceAnswer: "Hand", sentenceOptions: ["Hand", "Eye", "Nose", "Ear"] },
+                    { word: "Ear", vi: "Tai", image: getImg("ear"), quizOptions: ["Eye", "Nose", "Ear", "Mouth"], spellDisplay: "E _ R", spellAnswer: "A", spellOptions: ["A", "O", "U", "E"], sentence: "I hear with my ___.", sentenceAnswer: "Ear", sentenceOptions: ["Ear", "Hand", "Foot", "Eye"] },
+                    { word: "Mouth", vi: "Cái miệng", image: getImg("mouth"), quizOptions: ["Mouth", "Eye", "Nose", "Hair"], spellDisplay: "M O U _ H", spellAnswer: "T", spellOptions: ["T", "S", "C", "D"], sentence: "I eat with my ___.", sentenceAnswer: "Mouth", sentenceOptions: ["Mouth", "Eye", "Ear", "Hand"] },
+                    { word: "Nose", vi: "Cái mũi", image: getImg("nose"), quizOptions: ["Eye", "Ear", "Nose", "Hand"], spellDisplay: "N O _ E", spellAnswer: "S", spellOptions: ["S", "C", "T", "R"], sentence: "I smell with my ___.", sentenceAnswer: "Nose", sentenceOptions: ["Nose", "Book", "Car", "Shoe"] }
+                ]},
+                food: { title: "Đồ ăn (Food)", icon: "fa-hamburger", color: "bg-yellow-500", items: [
+                    { word: "Milk", vi: "Sữa", image: getImg("milk"), quizOptions: ["Water", "Milk", "Juice", "Tea"], spellDisplay: "M I L _", spellAnswer: "K", spellOptions: ["K", "C", "T", "P"], sentence: "I drink ___ everyday.", sentenceAnswer: "Milk", sentenceOptions: ["Milk", "Bread", "Meat", "Rice"] },
+                    { word: "Cake", vi: "Bánh ngọt", image: getImg("cake"), quizOptions: ["Cake", "Bread", "Apple", "Meat"], spellDisplay: "C _ K E", spellAnswer: "A", spellOptions: ["A", "E", "O", "U"], sentence: "I eat a birthday ___.", sentenceAnswer: "Cake", sentenceOptions: ["Cake", "Water", "Milk", "Shoe"] },
+                    { word: "Rice", vi: "Cơm", image: getImg("rice"), quizOptions: ["Meat", "Fish", "Rice", "Bread"], spellDisplay: "R I C _", spellAnswer: "E", spellOptions: ["E", "A", "K", "S"], sentence: "I eat ___ for dinner.", sentenceAnswer: "Rice", sentenceOptions: ["Rice", "Milk", "Juice", "Water"] },
+                    { word: "Bread", vi: "Bánh mì", image: getImg("bread"), quizOptions: ["Rice", "Bread", "Fish", "Meat"], spellDisplay: "B R E _ D", spellAnswer: "A", spellOptions: ["A", "E", "O", "U"], sentence: "I eat ___ for breakfast.", sentenceAnswer: "Bread", sentenceOptions: ["Bread", "Hat", "Car", "Sun"] },
+                    { word: "Fish", vi: "Con cá", image: getImg("fish"), quizOptions: ["Dog", "Cat", "Fish", "Bird"], spellDisplay: "F I S _", spellAnswer: "H", spellOptions: ["H", "T", "S", "M"], sentence: "The ___ swims in water.", sentenceAnswer: "Fish", sentenceOptions: ["Fish", "Bird", "Cat", "Dog"] }
+                ]},
+                toys: { title: "Đồ chơi (Toys)", icon: "fa-gamepad", color: "bg-purple-500", items: [
+                    { word: "Ball", vi: "Quả bóng", image: getImg("ball"), quizOptions: ["Doll", "Car", "Ball", "Kite"], spellDisplay: "B A L _", spellAnswer: "L", spellOptions: ["L", "T", "D", "R"], sentence: "I kick the ___.", sentenceAnswer: "Ball", sentenceOptions: ["Ball", "Doll", "Book", "Pen"] },
+                    { word: "Car", vi: "Ô tô đồ chơi", image: getImg("toy,car"), quizOptions: ["Car", "Train", "Plane", "Boat"], spellDisplay: "C _ R", spellAnswer: "A", spellOptions: ["A", "E", "O", "U"], sentence: "I play with my toy ___.", sentenceAnswer: "Car", sentenceOptions: ["Car", "Apple", "Milk", "Sun"] },
+                    { word: "Kite", vi: "Cái diều", image: getImg("kite"), quizOptions: ["Ball", "Kite", "Doll", "Robot"], spellDisplay: "K I T _", spellAnswer: "E", spellOptions: ["E", "A", "I", "O"], sentence: "I fly a ___ in the sky.", sentenceAnswer: "Kite", sentenceOptions: ["Kite", "Car", "Bike", "Train"] },
+                    { word: "Doll", vi: "Búp bê", image: getImg("doll"), quizOptions: ["Doll", "Ball", "Robot", "Kite"], spellDisplay: "D O L _", spellAnswer: "L", spellOptions: ["L", "T", "P", "S"], sentence: "She plays with a cute ___.", sentenceAnswer: "Doll", sentenceOptions: ["Doll", "Car", "Sun", "Book"] },
+                    { word: "Robot", vi: "Người máy", image: getImg("robot"), quizOptions: ["Robot", "Car", "Kite", "Ball"], spellDisplay: "R O B O _", spellAnswer: "T", spellOptions: ["T", "D", "S", "L"], sentence: "My ___ can walk and talk.", sentenceAnswer: "Robot", sentenceOptions: ["Robot", "Cat", "Dog", "Fish"] }
+                ]},
+                clothes: { title: "Quần áo (Clothes)", icon: "fa-tshirt", color: "bg-pink-500", items: [
+                    { word: "Hat", vi: "Cái mũ", image: getImg("hat"), quizOptions: ["Shirt", "Shoes", "Hat", "Dress"], spellDisplay: "H _ T", spellAnswer: "A", spellOptions: ["A", "O", "E", "U"], sentence: "I wear a ___ on my head.", sentenceAnswer: "Hat", sentenceOptions: ["Hat", "Shoe", "Sock", "Pants"] },
+                    { word: "Shirt", vi: "Áo sơ mi", image: getImg("shirt"), quizOptions: ["Pants", "Shirt", "Hat", "Sock"], spellDisplay: "S H I R _", spellAnswer: "T", spellOptions: ["T", "D", "K", "S"], sentence: "I wear a blue ___.", sentenceAnswer: "Shirt", sentenceOptions: ["Shirt", "Car", "Book", "Dog"] },
+                    { word: "Shoe", vi: "Chiếc giày", image: getImg("shoe"), quizOptions: ["Hat", "Shirt", "Shoe", "Dress"], spellDisplay: "S H O _", spellAnswer: "E", spellOptions: ["E", "A", "U", "I"], sentence: "I put on my ___s.", sentenceAnswer: "Shoe", sentenceOptions: ["Shoe", "Hat", "Pen", "Bag"] },
+                    { word: "Sock", vi: "Chiếc tất", image: getImg("sock"), quizOptions: ["Shoe", "Sock", "Pants", "Hat"], spellDisplay: "S O C _", spellAnswer: "K", spellOptions: ["K", "T", "C", "S"], sentence: "I wear a ___ on my foot.", sentenceAnswer: "Sock", sentenceOptions: ["Sock", "Hat", "Car", "Sun"] },
+                    { word: "Pants", vi: "Cái quần", image: getImg("pants"), quizOptions: ["Shirt", "Hat", "Pants", "Shoe"], spellDisplay: "P A N T _", spellAnswer: "S", spellOptions: ["S", "T", "R", "D"], sentence: "I wear long ___.", sentenceAnswer: "Pants", sentenceOptions: ["Pants", "Book", "Pen", "Desk"] }
+                ]},
+                rooms: { title: "Phòng ốc (Rooms)", icon: "fa-bed", color: "bg-indigo-500", items: [
+                    { word: "Bed", vi: "Cái giường", image: getImg("bed"), quizOptions: ["Sofa", "Table", "Bed", "Chair"], spellDisplay: "B _ D", spellAnswer: "E", spellOptions: ["E", "A", "O", "I"], sentence: "I sleep in my ___.", sentenceAnswer: "Bed", sentenceOptions: ["Bed", "Kitchen", "Yard", "Tree"] },
+                    { word: "Door", vi: "Cửa ra vào", image: getImg("door"), quizOptions: ["Window", "Door", "Wall", "Floor"], spellDisplay: "D O O _", spellAnswer: "R", spellOptions: ["R", "L", "T", "D"], sentence: "Open the ___ please.", sentenceAnswer: "Door", sentenceOptions: ["Door", "Book", "Eye", "Milk"] },
+                    { word: "Kitchen", vi: "Nhà bếp", image: getImg("kitchen"), quizOptions: ["Bedroom", "Kitchen", "Bathroom", "Garden"], spellDisplay: "K I T C H E _", spellAnswer: "N", spellOptions: ["N", "M", "L", "R"], sentence: "Mom cooks in the ___.", sentenceAnswer: "Kitchen", sentenceOptions: ["Kitchen", "Bed", "Car", "Tree"] },
+                    { word: "Sofa", vi: "Ghế sô-pha", image: getImg("sofa"), quizOptions: ["Sofa", "Bed", "Table", "Door"], spellDisplay: "S O F _", spellAnswer: "A", spellOptions: ["A", "E", "I", "U"], sentence: "I sit on the ___ to watch TV.", sentenceAnswer: "Sofa", sentenceOptions: ["Sofa", "Sun", "Moon", "Star"] },
+                    { word: "Table", vi: "Cái bàn", image: getImg("table"), quizOptions: ["Chair", "Sofa", "Bed", "Table"], spellDisplay: "T A B L _", spellAnswer: "E", spellOptions: ["E", "A", "I", "O"], sentence: "The book is on the ___.", sentenceAnswer: "Table", sentenceOptions: ["Table", "Eye", "Nose", "Ear"] }
+                ]},
+                actions: { title: "Hành động (Actions)", icon: "fa-running", color: "bg-green-600", items: [
+                    { word: "Run", vi: "Chạy", image: getImg("running"), quizOptions: ["Walk", "Jump", "Run", "Swim"], spellDisplay: "R _ N", spellAnswer: "U", spellOptions: ["U", "A", "E", "O"], sentence: "I ___ fast.", sentenceAnswer: "Run", sentenceOptions: ["Run", "Read", "Sleep", "Eat"] },
+                    { word: "Jump", vi: "Nhảy", image: getImg("jumping"), quizOptions: ["Sit", "Jump", "Run", "Stand"], spellDisplay: "J U M _", spellAnswer: "P", spellOptions: ["P", "B", "D", "T"], sentence: "I ___ up high.", sentenceAnswer: "Jump", sentenceOptions: ["Jump", "Drink", "Write", "Draw"] },
+                    { word: "Swim", vi: "Bơi", image: getImg("swimming"), quizOptions: ["Swim", "Run", "Fly", "Climb"], spellDisplay: "S W I _", spellAnswer: "M", spellOptions: ["M", "N", "W", "V"], sentence: "I ___ in the pool.", sentenceAnswer: "Swim", sentenceOptions: ["Swim", "Walk", "Read", "Eat"] },
+                    { word: "Walk", vi: "Đi bộ", image: getImg("walking"), quizOptions: ["Run", "Jump", "Walk", "Swim"], spellDisplay: "W A L _", spellAnswer: "K", spellOptions: ["K", "T", "D", "P"], sentence: "I ___ to school every day.", sentenceAnswer: "Walk", sentenceOptions: ["Walk", "Fly", "Sleep", "Eat"] },
+                    { word: "Sleep", vi: "Ngủ", image: getImg("sleeping"), quizOptions: ["Sleep", "Run", "Jump", "Walk"], spellDisplay: "S L E E _", spellAnswer: "P", spellOptions: ["P", "T", "D", "S"], sentence: "I ___ in my bed at night.", sentenceAnswer: "Sleep", sentenceOptions: ["Sleep", "Drink", "Write", "Draw"] }
+                ]},
+                shapes: { title: "Hình khối (Shapes)", icon: "fa-shapes", color: "bg-teal-500", items: [
+                    { word: "Circle", vi: "Hình tròn", image: getImg("circle"), quizOptions: ["Square", "Circle", "Triangle", "Star"], spellDisplay: "C I R C L _", spellAnswer: "E", spellOptions: ["E", "A", "I", "O"], sentence: "The sun is a ___.", sentenceAnswer: "Circle", sentenceOptions: ["Circle", "Square", "Line", "Box"] },
+                    { word: "Square", vi: "Hình vuông", image: getImg("square"), quizOptions: ["Circle", "Star", "Square", "Line"], spellDisplay: "S Q U A R _", spellAnswer: "E", spellOptions: ["E", "A", "Y", "I"], sentence: "A box is a ___.", sentenceAnswer: "Square", sentenceOptions: ["Square", "Circle", "Dog", "Cat"] },
+                    { word: "Star", vi: "Ngôi sao", image: getImg("star"), quizOptions: ["Moon", "Sun", "Star", "Cloud"], spellDisplay: "S T A _", spellAnswer: "R", spellOptions: ["R", "L", "N", "M"], sentence: "I see a ___ in the sky.", sentenceAnswer: "Star", sentenceOptions: ["Star", "Square", "Circle", "Line"] },
+                    { word: "Triangle", vi: "Hình tam giác", image: getImg("triangle"), quizOptions: ["Circle", "Square", "Triangle", "Star"], spellDisplay: "T R I A N G L _", spellAnswer: "E", spellOptions: ["E", "A", "O", "I"], sentence: "A pizza slice is a ___.", sentenceAnswer: "Triangle", sentenceOptions: ["Triangle", "Circle", "Line", "Box"] },
+                    { word: "Heart", vi: "Hình trái tim", image: getImg("heart"), quizOptions: ["Heart", "Star", "Circle", "Square"], spellDisplay: "H E A R _", spellAnswer: "T", spellOptions: ["T", "D", "P", "S"], sentence: "The shape of love is a ___.", sentenceAnswer: "Heart", sentenceOptions: ["Heart", "Dog", "Cat", "Fish"] }
+                ]},
+                nature: { title: "Thiên nhiên (Nature)", icon: "fa-leaf", color: "bg-emerald-500", items: [
+                    { word: "Sun", vi: "Mặt trời", image: getImg("sun"), quizOptions: ["Moon", "Star", "Sun", "Cloud"], spellDisplay: "S _ N", spellAnswer: "U", spellOptions: ["U", "A", "E", "I"], sentence: "The ___ is hot.", sentenceAnswer: "Sun", sentenceOptions: ["Sun", "Tree", "Flower", "River"] },
+                    { word: "Tree", vi: "Cái cây", image: getImg("tree"), quizOptions: ["Flower", "Grass", "Tree", "Leaf"], spellDisplay: "T R E _", spellAnswer: "E", spellOptions: ["E", "A", "I", "O"], sentence: "A bird is in the ___.", sentenceAnswer: "Tree", sentenceOptions: ["Tree", "Sun", "Moon", "Star"] },
+                    { word: "Flower", vi: "Bông hoa", image: getImg("flower"), quizOptions: ["Tree", "Flower", "Grass", "Bush"], spellDisplay: "F L O W E _", spellAnswer: "R", spellOptions: ["R", "L", "S", "N"], sentence: "I smell the ___.", sentenceAnswer: "Flower", sentenceOptions: ["Flower", "Sun", "Rock", "Sand"] },
+                    { word: "Moon", vi: "Mặt trăng", image: getImg("moon"), quizOptions: ["Moon", "Sun", "Star", "Cloud"], spellDisplay: "M O O _", spellAnswer: "N", spellOptions: ["N", "M", "L", "T"], sentence: "I see the ___ at night.", sentenceAnswer: "Moon", sentenceOptions: ["Moon", "Tree", "Flower", "River"] },
+                    { word: "Cloud", vi: "Đám mây", image: getImg("cloud"), quizOptions: ["Sun", "Moon", "Cloud", "Star"], spellDisplay: "C L O U _", spellAnswer: "D", spellOptions: ["D", "T", "P", "B"], sentence: "The ___ is white and fluffy.", sentenceAnswer: "Cloud", sentenceOptions: ["Cloud", "Tree", "Rock", "Sand"] }
+                ]},
+                animals: { title: "Động vật (Animals)", icon: "fa-dog", color: "bg-amber-600", items: [
+                    { word: "Cat", vi: "Con mèo", image: getImg("cat"), quizOptions: ["Dog", "Cat", "Bird", "Fish"], spellDisplay: "C _ T", spellAnswer: "A", spellOptions: ["A", "E", "O", "I"], sentence: "My ___ says meow.", sentenceAnswer: "Cat", sentenceOptions: ["Cat", "Dog", "Pig", "Cow"] },
+                    { word: "Dog", vi: "Con chó", image: getImg("dog"), quizOptions: ["Cat", "Fish", "Dog", "Bird"], spellDisplay: "D _ G", spellAnswer: "O", spellOptions: ["O", "U", "A", "E"], sentence: "The ___ barks loudly.", sentenceAnswer: "Dog", sentenceOptions: ["Dog", "Cat", "Bird", "Fish"] },
+                    { word: "Bird", vi: "Con chim", image: getImg("bird"), quizOptions: ["Tiger", "Lion", "Bird", "Bear"], spellDisplay: "B I R _", spellAnswer: "D", spellOptions: ["D", "T", "P", "B"], sentence: "The ___ flies high.", sentenceAnswer: "Bird", sentenceOptions: ["Bird", "Dog", "Cat", "Fish"] },
+                    { word: "Tiger", vi: "Con hổ", image: getImg("tiger"), quizOptions: ["Tiger", "Lion", "Bear", "Dog"], spellDisplay: "T I G E _", spellAnswer: "R", spellOptions: ["R", "L", "T", "S"], sentence: "The ___ is orange and black.", sentenceAnswer: "Tiger", sentenceOptions: ["Tiger", "Cat", "Bird", "Fish"] },
+                    { word: "Elephant", vi: "Con voi", image: getImg("elephant"), quizOptions: ["Tiger", "Lion", "Elephant", "Bear"], spellDisplay: "E L E P H A N _", spellAnswer: "T", spellOptions: ["T", "D", "S", "P"], sentence: "The ___ is very big.", sentenceAnswer: "Elephant", sentenceOptions: ["Elephant", "Dog", "Cat", "Bird"] }
+                ]},
+                colors: { title: "Màu sắc (Colors)", icon: "fa-palette", color: "bg-fuchsia-500", items: [
+                    { word: "Red", vi: "Màu đỏ", image: getImg("red,color"), quizOptions: ["Blue", "Red", "Green", "Yellow"], spellDisplay: "R _ D", spellAnswer: "E", spellOptions: ["E", "A", "I", "U"], sentence: "The apple is ___.", sentenceAnswer: "Red", sentenceOptions: ["Red", "Blue", "Black", "White"] },
+                    { word: "Blue", vi: "Màu xanh dương", image: getImg("blue,color"), quizOptions: ["Red", "Yellow", "Blue", "Pink"], spellDisplay: "B L _ E", spellAnswer: "U", spellOptions: ["U", "O", "A", "E"], sentence: "The sky is ___.", sentenceAnswer: "Blue", sentenceOptions: ["Blue", "Red", "Green", "Black"] },
+                    { word: "Yellow", vi: "Màu vàng", image: getImg("yellow,color"), quizOptions: ["Green", "Yellow", "Red", "Blue"], spellDisplay: "Y E L L O _", spellAnswer: "W", spellOptions: ["W", "V", "M", "N"], sentence: "The sun is ___.", sentenceAnswer: "Yellow", sentenceOptions: ["Yellow", "Pink", "Purple", "Gray"] },
+                    { word: "Green", vi: "Màu xanh lá", image: getImg("green,color"), quizOptions: ["Green", "Blue", "Red", "Yellow"], spellDisplay: "G R E E _", spellAnswer: "N", spellOptions: ["N", "M", "L", "R"], sentence: "The leaf is ___.", sentenceAnswer: "Green", sentenceOptions: ["Green", "Red", "Black", "White"] },
+                    { word: "Black", vi: "Màu đen", image: getImg("black,color"), quizOptions: ["White", "Black", "Red", "Blue"], spellDisplay: "B L A C _", spellAnswer: "K", spellOptions: ["K", "C", "T", "P"], sentence: "The night sky is ___.", sentenceAnswer: "Black", sentenceOptions: ["Black", "Green", "Yellow", "White"] }
+                ]},
+                family: { title: "Gia đình (Family)", icon: "fa-users", color: "bg-rose-500", items: [
+                    { word: "Mother", vi: "Mẹ", image: getImg("mother"), quizOptions: ["Father", "Mother", "Brother", "Sister"], spellDisplay: "M O _ H E R", spellAnswer: "T", spellOptions: ["T", "S", "D", "F"], sentence: "I love my ___.", sentenceAnswer: "Mother", sentenceOptions: ["Mother", "Car", "Cat", "Dog"] },
+                    { word: "Father", vi: "Bố", image: getImg("father"), quizOptions: ["Brother", "Sister", "Father", "Mother"], spellDisplay: "F A T H E _", spellAnswer: "R", spellOptions: ["R", "L", "S", "N"], sentence: "My ___ is tall.", sentenceAnswer: "Father", sentenceOptions: ["Father", "Bird", "Fish", "Apple"] },
+                    { word: "Brother", vi: "Anh/Em trai", image: getImg("brother"), quizOptions: ["Mother", "Brother", "Sister", "Father"], spellDisplay: "B R O _ H E R", spellAnswer: "T", spellOptions: ["T", "D", "C", "S"], sentence: "He is my ___.", sentenceAnswer: "Brother", sentenceOptions: ["Brother", "Sister", "Mother", "Car"] },
+                    { word: "Sister", vi: "Chị/Em gái", image: getImg("sister"), quizOptions: ["Brother", "Sister", "Mother", "Father"], spellDisplay: "S I S T E _", spellAnswer: "R", spellOptions: ["R", "L", "N", "M"], sentence: "She is my ___.", sentenceAnswer: "Sister", sentenceOptions: ["Sister", "Brother", "Car", "Dog"] },
+                    { word: "Grandma", vi: "Bà", image: getImg("grandmother"), quizOptions: ["Grandpa", "Grandma", "Mother", "Sister"], spellDisplay: "G R A N D M _", spellAnswer: "A", spellOptions: ["A", "E", "O", "I"], sentence: "My ___ is very kind.", sentenceAnswer: "Grandma", sentenceOptions: ["Grandma", "Cat", "Dog", "Bird"] }
+                ]}
+            }
+        };
+
+        // --- 3. STATE & LOGIC ---
+        let currentDifficulty = 'normal'; // default
+        let state = { category: null, itemIndex: 0, phase: 0, score: 0, xp: 0, correct: new Set(), wrong: new Set(), failedCurrent: false };
+
+        function setDifficulty(level, btn) {
+            currentDifficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(b => { b.classList.remove('active', 'bg-blue-500', 'text-white', 'border-blue-600'); b.classList.add('bg-white', 'text-gray-600'); });
+            btn.classList.add('active', 'bg-blue-500', 'text-white', 'border-blue-600');
+            btn.classList.remove('bg-white', 'text-gray-600');
+            
+            const desc = document.getElementById('difficulty-desc');
+            if(level === 'easy') desc.innerText = "Bao gồm: Học từ ➡️ Trắc nghiệm (2 lựa chọn)";
+            if(level === 'normal') desc.innerText = "Bao gồm: Học từ ➡️ Trắc nghiệm ➡️ Điền chữ";
+            if(level === 'hard') desc.innerText = "Bao gồm: Học từ ➡️ Trắc nghiệm ➡️ Điền chữ ➡️ Điền câu";
+        }
+
+        function initApp() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = '';
+            for (let key in appData.categories) {
+                const cat = appData.categories[key];
+                list.innerHTML += `
+                    <button onclick="startGame('${key}')" class="btn-duo w-full ${cat.color} border-b-4 border-black/20 text-white rounded-2xl p-4 flex items-center shadow-sm">
+                        <div class="bg-white/20 w-12 h-12 flex justify-center items-center rounded-xl mr-4 text-2xl"><i class="fas ${cat.icon}"></i></div>
+                        <div class="text-left flex-1">
+                            <h3 class="text-lg font-bold">${cat.title}</h3>
+                            <p class="text-white/80 text-xs font-medium">${cat.items.length} từ vựng</p>
+                        </div>
+                        <i class="fas fa-play-circle text-2xl text-white/50"></i>
+                    </button>
+                `;
+            }
+        }
+
+        function startGame(catKey) {
+            state = { category: catKey, itemIndex: 0, phase: 1, score: 0, xp: 0, correct: new Set(), wrong: new Set(), failedCurrent: false };
+            document.getElementById('top-bar').classList.remove('hidden'); document.getElementById('top-bar').classList.add('flex');
+            document.getElementById('confetti-canvas').classList.add('hidden');
+            renderPhase();
+        }
+
+        function returnToHome() {
+            document.getElementById('top-bar').classList.add('hidden'); document.getElementById('top-bar').classList.remove('flex');
+            state.phase = 0;
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('screen-0').classList.add('active');
+        }
+
+        function getOpts(arr, count) {
+            let shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function renderPhase() {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(`screen-${state.phase}`).classList.add('active');
+            if (state.phase === 0) return;
+
+            updateProgress();
+            const item = appData.categories[state.category].items[state.itemIndex];
+
+            if (state.phase === 1) { // Flashcard
+                document.getElementById('flashcard-img').src = item.image;
+                document.getElementById('flashcard-en').innerText = item.word;
+                document.getElementById('flashcard-vi').innerText = item.vi;
+                setTimeout(() => playAudio('word'), 400);
+            } 
+            else if (state.phase === 2) { // Quiz
+                document.getElementById('quiz-img').src = item.image;
+                const optsBox = document.getElementById('quiz-options'); optsBox.innerHTML = '';
+                
+                // Difficulty mod: Easy shows 2 options, Normal/Hard shows 4
+                let optCount = currentDifficulty === 'easy' ? 2 : 4;
+                let finalOpts = [...item.quizOptions];
+                if(optCount === 2) {
+                    finalOpts = [item.word, item.quizOptions.find(o => o !== item.word)].sort(() => 0.5 - Math.random());
+                }
+
+                finalOpts.forEach(opt => {
+                    optsBox.innerHTML += `<button onclick="checkAns(this, '${opt}', '${item.word}')" class="btn-duo bg-white border-2 border-gray-200 border-b-4 hover:bg-blue-50 text-gray-700 font-bold text-xl py-5 rounded-2xl">${opt}</button>`;
+                });
+                setTimeout(() => playAudio('word'), 400);
+            }
+            else if (state.phase === 3) { // Spell
+                document.getElementById('spell-img').src = item.image;
+                document.getElementById('spell-word').innerText = item.spellDisplay;
+                const optsBox = document.getElementById('spell-options'); optsBox.innerHTML = '';
+                item.spellOptions.forEach(opt => {
+                    optsBox.innerHTML += `<button onclick="checkAns(this, '${opt}', '${item.spellAnswer}')" class="btn-duo bg-white border-2 border-gray-200 border-b-4 hover:bg-blue-50 text-gray-700 font-bold text-2xl py-4 rounded-2xl">${opt}</button>`;
+                });
+            }
+            else if (state.phase === 4) { // Sentence
+                document.getElementById('sentence-text').innerHTML = item.sentence.replace('___', '<span class="text-gray-300 border-b-4 border-gray-300 px-4">___</span>');
+                const optsBox = document.getElementById('sentence-options'); optsBox.innerHTML = '';
+                item.sentenceOptions.forEach(opt => {
+                    optsBox.innerHTML += `<button onclick="checkAns(this, '${opt}', '${item.sentenceAnswer}')" class="btn-duo w-full bg-white border-2 border-gray-200 border-b-4 hover:bg-blue-50 text-gray-700 font-bold text-xl py-4 rounded-2xl">${opt}</button>`;
+                });
+            }
+            else if (state.phase === 5) { // Result
+                document.getElementById('top-bar').classList.add('hidden');
+                document.getElementById('final-xp').innerText = state.xp;
+                const cList = document.getElementById('correct-list'); const wList = document.getElementById('wrong-list');
+                cList.innerHTML = ''; wList.innerHTML = '';
+                
+                state.correct.forEach(w => cList.innerHTML += `<span class="bg-white text-green-700 px-3 py-1 rounded-lg border border-green-200 font-bold text-sm">${w}</span>`);
+                if(state.wrong.size > 0) {
+                    document.getElementById('wrong-container').classList.remove('hidden');
+                    state.wrong.forEach(w => wList.innerHTML += `<span class="bg-white text-red-700 px-3 py-1 rounded-lg border border-red-200 font-bold text-sm">${w}</span>`);
+                } else {
+                    document.getElementById('wrong-container').classList.add('hidden');
+                }
+                triggerConfetti();
+            }
+        }
+
+        function checkAns(btn, selected, correct) {
+            const parent = btn.parentElement;
+            Array.from(parent.children).forEach(child => child.disabled = true);
+            const item = appData.categories[state.category].items[state.itemIndex];
+
+            if (selected === correct) {
+                playSfx('correct');
+                btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-700');
+                if(!state.failedCurrent) { state.correct.add(item.word); state.xp += 10; }
+                
+                // Update text visually for Spelling/Sentence
+                if(state.phase === 3) document.getElementById('spell-word').innerText = item.word.toUpperCase();
+                if(state.phase === 4) document.getElementById('sentence-text').innerHTML = item.sentence.replace('___', `<span class="text-green-500">${item.sentenceAnswer}</span>`);
+
+                setTimeout(handleCorrect, 600);
+            } else {
+                playSfx('wrong');
+                state.failedCurrent = true;
+                state.wrong.add(item.word); state.correct.delete(item.word);
+                btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                btn.classList.add('bg-red-500', 'text-white', 'border-red-700');
+                document.getElementById(`screen-${state.phase}`).classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById(`screen-${state.phase}`).classList.remove('shake');
+                    Array.from(parent.children).forEach(child => {
+                        if(child !== btn) child.disabled = false; // re-enable others
+                    });
+                }, 400);
+            }
+        }
+
+        function handleCorrect() {
+            // Difficulty Logic Controller
+            let maxPhase = 4; // Hard
+            if(currentDifficulty === 'easy') maxPhase = 2;
+            if(currentDifficulty === 'normal') maxPhase = 3;
+
+            state.phase++;
+            if (state.phase > maxPhase) {
+                state.itemIndex++;
+                state.phase = 1; // loop back to flashcard
+                state.failedCurrent = false; // reset flag
+            }
+            if (state.itemIndex >= appData.categories[state.category].items.length) {
+                state.phase = 5; // End screen
+            }
+            renderPhase();
+        }
+
+        function updateProgress() {
+            let maxPhase = currentDifficulty === 'easy' ? 2 : (currentDifficulty === 'normal' ? 3 : 4);
+            const totalSteps = appData.categories[state.category].items.length * maxPhase;
+            const currentStep = (state.itemIndex * maxPhase) + (state.phase - 1);
+            const percent = state.phase === 5 ? 100 : Math.max(0, (currentStep / totalSteps) * 100);
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('xp-counter').innerText = state.xp;
+        }
+
+        // --- 4. SIMPLE CONFETTI ---
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.classList.remove('hidden');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let particles = [];
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d'];
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 10 + 5, h: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2, vx: Math.random() * 2 - 1
+                });
+            }
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.w, p.h);
+                    p.y += p.vy; p.x += p.vx;
+                    if(p.y > canvas.height) p.y = -10;
+                });
+                if(state.phase === 5) requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // Init
+        window.onload = initApp;
+    </script>
+</body>
+</html>
