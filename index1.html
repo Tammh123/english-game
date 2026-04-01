@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tammh_TOL: English Adventure Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; background-color: #f7f7f7; touch-action: manipulation; user-select: none; }
+        .btn-chunky { transition: all 0.1s ease; border-bottom-width: 4px; }
+        .btn-chunky:active { transform: translateY(2px); border-bottom-width: 0px; margin-bottom: 4px; }
+        .btn-primary { background-color: #58cc02; border-color: #46a302; color: white; }
+        .btn-secondary { background-color: #1cb0f6; border-color: #1899d6; color: white; }
+        .btn-white { background-color: white; border-color: #e5e5e5; color: #4b4b4b; }
+        .btn-danger { background-color: #ff4b4b; border-color: #d33131; color: white; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+        @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .progress-fill { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .level-easy { background-color: #58cc02; }
+        .level-normal { background-color: #1cb0f6; }
+        .level-hard { background-color: #ff9600; }
+        .level-extreme { background-color: #ff4b4b; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+
+    <nav id="nav-bar" class="w-full max-w-md px-6 py-4 flex items-center gap-4 hidden bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <button onclick="confirmExit()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        <div class="flex-1 bg-gray-200 h-3 rounded-full overflow-hidden border-b-2 border-gray-300">
+            <div id="progress-bar" class="progress-fill bg-green-500 h-full w-0"></div>
+        </div>
+        <div class="flex items-center gap-2 text-orange-500 font-extrabold">
+            <i class="fa-solid fa-bolt"></i><span id="score-display">0</span>
+        </div>
+    </nav>
+
+    <main id="app-container" class="w-full max-w-md flex-1 flex flex-col px-6 py-4 justify-center">
+        </main>
+
+    <script>
+        /** * DATA STRUCTURE
+         * grade8: Topics from Vietnam Ministry of Education (Global Success)
+         * adults: Business & Communication
+         */
+        const appData = {
+            grade8: {
+                title: "Lớp 8 (Global Success)",
+                items: [
+                    {
+                        word: "Countryside", vi: "Nông thôn",
+                        image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400",
+                        sentence: "Life in the ___ is peaceful and quiet.",
+                        distractors: ["City", "Office", "School", "Market", "Gym"]
+                    },
+                    {
+                        word: "Leisure", vi: "Thư giãn/Giải trí",
+                        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400",
+                        sentence: "What do you like doing in your ___ time?",
+                        distractors: ["Busy", "Working", "Hard", "Fast", "Late"]
+                    },
+                    {
+                        word: "Environment", vi: "Môi trường",
+                        image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400",
+                        sentence: "We should protect the ___ from pollution.",
+                        distractors: ["House", "Computer", "Technology", "Traffic", "Economy"]
+                    }
+                ]
+            },
+            adults: {
+                title: "Người đi làm",
+                items: [
+                    {
+                        word: "Negotiation", vi: "Đàm phán",
+                        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400",
+                        sentence: "The sales ___ took longer than expected.",
+                        distractors: ["Lunch", "Game", "Sleep", "Holiday", "Trip"]
+                    },
+                    {
+                        word: "Presentation", vi: "Thuyết trình",
+                        image: "https://images.unsplash.com/photo-1475721027785-f74dea327912?w=400",
+                        sentence: "She gave a brilliant ___ about the new project.",
+                        distractors: ["Music", "Food", "Picture", "Box", "Song"]
+                    },
+                    {
+                        word: "Deadline", vi: "Hạn chót",
+                        image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400",
+                        sentence: "We must finish the report before the ___.",
+                        distractors: ["Start", "Morning", "Weekend", "Door", "Lunch"]
+                    }
+                ]
+            }
+        };
+
+        let state = {
+            grade: null,
+            difficulty: null, // easy, normal, hard, extreme
+            items: [],
+            currentIndex: 0,
+            phase: 1, // 1: Learn, 2: ImageQuiz, 3: Spelling, 4: Context
+            score: 0,
+            correctWords: [],
+            wrongWords: [],
+            totalSteps: 0,
+            currentStep: 0
+        };
+
+        const container = document.getElementById('app-container');
+
+        function init() { renderGradeSelect(); }
+
+        // --- RENDER SCREENS ---
+
+        function renderGradeSelect() {
+            document.getElementById('nav-bar').classList.add('hidden');
+            container.innerHTML = `
+                <div class="animate-pop text-center">
+                    <img src="https://d35aaqx5ub95lt.cloudfront.net/images/owls/769733075b927282c0e86b0a2323e433.svg" class="w-32 mx-auto mb-6">
+                    <h1 class="text-2xl font-black text-gray-700 mb-6">Bạn muốn học cấp độ nào?</h1>
+                    <div class="grid grid-cols-1 gap-3">
+                        <button onclick="selectGrade('grade8')" class="btn-chunky btn-secondary py-4 rounded-2xl font-bold text-lg">Lớp 8 (Bộ Giáo Dục)</button>
+                        <button onclick="selectGrade('adults')" class="btn-chunky btn-secondary py-4 rounded-2xl font-bold text-lg">Người đi làm</button>
+                        <div class="grid grid-cols-2 gap-2 opacity-50">
+                            <button class="btn-chunky btn-white py-2 rounded-xl text-sm font-bold">Lớp 1-7</button>
+                            <button class="btn-chunky btn-white py-2 rounded-xl text-sm font-bold">Lớp 9</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function selectGrade(g) { state.grade = g; renderDifficultySelect(); }
+
+        function renderDifficultySelect() {
+            container.innerHTML = `
+                <div class="animate-pop text-center">
+                    <h1 class="text-2xl font-black text-gray-700 mb-8">Chọn mức độ thử thách</h1>
+                    <div class="space-y-4">
+                        <button onclick="startGame('easy')" class="w-full btn-chunky level-easy text-white py-4 rounded-2xl font-black">DỄ (2 đáp án)</button>
+                        <button onclick="startGame('normal')" class="w-full btn-chunky level-normal text-white py-4 rounded-2xl font-black">BÌNH THƯỜNG (4 đáp án)</button>
+                        <button onclick="startGame('hard')" class="w-full btn-chunky level-hard text-white py-4 rounded-2xl font-black">KHÓ (5 đáp án)</button>
+                        <button onclick="startGame('extreme')" class="w-full btn-chunky level-extreme text-white py-4 rounded-2xl font-black">SIÊU KHÓ (6 đáp án)</button>
+                    </div>
+                </div>`;
+        }
+
+        function startGame(diff) {
+            state.difficulty = diff;
+            state.items = [...appData[state.grade].items];
+            state.score = 0;
+            state.currentIndex = 0;
+            state.phase = 1;
+            state.currentStep = 0;
+            state.totalSteps = state.items.length * 4;
+            document.getElementById('nav-bar').classList.remove('hidden');
+            renderGame();
+        }
+
+        // --- GAME LOOP ---
+
+        function renderGame() {
+            updateUI();
+            const item = state.items[state.currentIndex];
+            if (!item) { renderResults(); return; }
+
+            if (state.phase === 1) renderLearn(item);
+            else if (state.phase === 2) renderImageQuiz(item);
+            else if (state.phase === 3) renderSpelling(item);
+            else if (state.phase
